@@ -36,7 +36,7 @@ struct PlayerButton: View {
                 isAnimating = true
             }
         } label: {
-            HStack(spacing: -2) {
+            HStack(spacing: 0) {
                 icon.frame(
                     width: isAnimating ? Constants.size : 0,
                     height: isAnimating ? Constants.size : 0
