@@ -8,16 +8,31 @@
 import SwiftUI
 
 struct PlayerButtonStyle: ButtonStyle {
+    
+    var duration: Double = 0.22
+    var scale: Double = 0.86
+    @State private var isPressed: Bool = false
+    
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .brightness(0)
             .background {
-                if configuration.isPressed {
+                if isPressed {
                     Circle()
                         .foregroundColor(.black.opacity(0.1))
                         .frame(width: 100, height: 100)
                 }
             }
+            .scaleEffect(isPressed ? scale : 1)
+            .animation(.linear(duration: duration), value: isPressed)
+            .onChange(of: configuration.isPressed, perform: { newValue in
+                guard newValue else { return }
+                
+                isPressed = newValue
+                DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+                    isPressed = false
+                }
+            })
     }
 }
 
@@ -56,7 +71,6 @@ struct PlayerButton: View {
                 value: isAnimating
             )
         }
-        .buttonStyle(PlayerButtonStyle())
     }
     
     var icon: some View {
@@ -68,7 +82,24 @@ struct PlayerButton: View {
 
 struct ContentView: View {
     var body: some View {
-        PlayerButton()
+        HStack {
+            VStack {
+                PlayerButton()
+                    .buttonStyle(PlayerButtonStyle(duration: 1, scale: 0))
+                    .padding([.bottom], 100)
+                
+                Text("duration: 1 sec")
+                Text("scale: 0")
+            }
+            VStack {
+                PlayerButton()
+                    .buttonStyle(PlayerButtonStyle())
+                    .padding([.bottom], 100)
+                
+                Text("duration: default")
+                Text("scale: default")
+            }
+        }
     }
 }
 
